@@ -379,8 +379,8 @@ public class BulkCopy {
                 .setThreadsMultiplier(6)
                 .build();
 
-        bulkCopy.dropTables(Arrays.asList("temporal", "spatial", "object_properties", "objects", "relations",
-                "entities"));
+        bulkCopy.dropTables(Arrays.asList("clues_ke.temporal", "clues_ke.spatial", "clues_ke.object_properties",
+                "clues_ke.objects", "clues_ke.relations", "clues_ke.entities"));
         bulkCopy.copy();
     }
 
