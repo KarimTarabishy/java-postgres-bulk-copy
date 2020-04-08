@@ -66,6 +66,7 @@ public class Transform implements Callable<Void> {
                 }
                 String [] lines = data.split("\n");
                 finalItems.addAll(Arrays.stream(lines)
+                        .filter(s -> !s.trim().isEmpty())
                         .map(s -> new InputItem(s, true))
                         .collect(Collectors.toCollection(ArrayList::new)));
             }
