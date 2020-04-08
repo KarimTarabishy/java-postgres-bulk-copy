@@ -76,9 +76,9 @@ public class Transform implements Callable<Void> {
 
             for(InputItem i : finalItems) {
                 for (InputTransformer transformer : transformers) {
-                    transformer.transform(item);
+                    transformer.transform(i);
                 }
-                if (!addToQueue(item)) {
+                if (!addToQueue(i)) {
                     return null;
                 }
             }
