@@ -20,12 +20,13 @@ public class Read implements Callable<Long> {
     private BlockingQueue<InputItem> pendingTransform;
     private ArrayList<String> paths;
     private volatile int currentIndex = 0;
-
+    private int transformerThreadsCount;
     public Read(String input_gcs_path, BlockingQueue<InputItem> pendingTransform,
-                AtomicBoolean forceStop){
+                AtomicBoolean forceStop, int transformerThreadsCount){
         this.inputGCSPath = input_gcs_path;
         this.forceStop = forceStop;
         this.pendingTransform = pendingTransform;
+        this.transformerThreadsCount = transformerThreadsCount;
         paths = fetchPathsOrSelf(inputGCSPath);
     }
 
@@ -61,7 +62,12 @@ public class Read implements Callable<Long> {
         InputItem end = new InputItem("", true);
         end.nullifyData();
 
-        return addToQueue(end) ? total:0L;
+        for(int i = 0; i < transformerThreadsCount; i++){
+            if(!addToQueue(end)){
+                return 0L;
+            }
+        }
+        return  total;
     }
 
     private boolean addToQueue(InputItem item){

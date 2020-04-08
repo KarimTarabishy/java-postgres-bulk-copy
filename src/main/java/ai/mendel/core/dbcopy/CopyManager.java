@@ -31,7 +31,7 @@ public class CopyManager {
 
         ExecutorService service =  Executors.newFixedThreadPool(threads);
         try {
-            Read reader = new Read(configs.inputTSVPath, pendingTransform, forceStop);
+            Read reader = new Read(configs.inputTSVPath, pendingTransform, forceStop, threads - 2);
             readTask = service.submit(reader);
             copyTask = service.submit(new Copy(pendingWrite, configs.escapedColumns,
                     configs.fieldsMapper, configs.copyAsTSV, configs.nullString, configs.url, configs.user,
