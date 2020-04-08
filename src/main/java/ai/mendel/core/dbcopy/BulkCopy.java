@@ -12,11 +12,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 class BulkCopyBuilder {
     String inputTSVPath, tableName, outputPath, url, user, password;
@@ -87,7 +87,7 @@ class BulkCopyBuilder {
      * @param columnNames list of database column names to escape
      * @return
      */
-    public BulkCopyBuilder addEscapedColumns(List<String> columnNames){
+    public BulkCopyBuilder setEscapedColumns(List<String> columnNames){
         this.escapedColumns.addAll(columnNames);
         return this;
     }
@@ -376,6 +376,7 @@ public class BulkCopy {
                         new IndexToColumnMapper(5, "start"),
                         new IndexToColumnMapper(6, "\"end\"")
                 )))
+                .setEscapedColumns(Collections.singletonList("text"))
                 .dropConstraints()
                 .setNullString("null")
                 .setThreadsMultiplier(6)
