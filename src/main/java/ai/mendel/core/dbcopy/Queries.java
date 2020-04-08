@@ -11,7 +11,7 @@ public class Queries {
     }
 
     public static String createconstraints(String tableName, String resultColName){
-        String [] parts = tableName.split(".");
+        String [] parts = tableName.split("\\.");
         String schema = "public";
         String rel = parts[0];
         if(parts.length == 2){
@@ -31,7 +31,7 @@ public class Queries {
     }
 
     public static String dropConstraints(String tableName, String resultColName){
-        String [] parts = tableName.split(".");
+        String [] parts = tableName.split("\\.");
         String schema = "public";
         String rel = parts[0];
         if(parts.length == 2){
