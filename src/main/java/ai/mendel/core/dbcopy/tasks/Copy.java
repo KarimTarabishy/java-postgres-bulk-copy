@@ -119,6 +119,7 @@ public class Copy implements Callable<Long> {
                     if (row.length() == 0) {
                         continue;
                     }
+                    row += "\n";
                 }
                 catch (Exception e){
                     throw new RuntimeException("Error while processing copy of item: \n" +
