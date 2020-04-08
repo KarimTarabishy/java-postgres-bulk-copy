@@ -49,7 +49,7 @@ public class Queries {
     }
 
     public static String createIndices(String tableName, String resultColName){
-        return "select  indexdef as " + resultColName +"\n" +
+        return "select  indexdef||';' as " + resultColName +"\n" +
                 "from pg_index pgi\n" +
                 "  join pg_class idx on idx.oid = pgi.indexrelid\n" +
                 "  join pg_class tbl on tbl.oid = pgi.indrelid\n" +

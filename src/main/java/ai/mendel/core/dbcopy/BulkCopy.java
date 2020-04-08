@@ -211,9 +211,11 @@ public class BulkCopy {
         try(DataStore store = new DataStore(getMultiQueryURL(configs.url), configs.user, configs.password, 3)){
             store.retriableSqlBlock(conn -> {
                 try (Statement stmt = conn.createStatement()) {
+                    logger.info("recreating constraints: \n" + constraints);
                    stmt.execute(constraints);
                 }
                 try (Statement stmt = conn.createStatement()) {
+                    logger.info("recreating indices: \n" + indices);
                     stmt.execute(indices);
                 }
             });
