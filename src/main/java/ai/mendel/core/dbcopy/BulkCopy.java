@@ -333,7 +333,7 @@ public class BulkCopy {
         String url = args[0], user = args[1], password = args[2];
         BulkCopy bulkCopy = BulkCopy.build(
                 "gs://pipeline_output/expert/3-5-2020/test_new_copy",
-                "gs://pipeline_output/expert/3-5-2020/clues-ke-7/listing.tsv",
+                "gs://pipeline_output/expert/3-5-2020/clues-ke-8/listing.tsv",
                 "clues_ke.entities",
                 true,
                 url, user, password)
