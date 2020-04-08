@@ -378,7 +378,7 @@ public class BulkCopy {
                 )))
                 .setEscapedColumns(Collections.singletonList("text"))
                 .dropConstraints()
-                .setNullString("null")
+                .setNullString("\\N")
                 .setThreadsMultiplier(6)
                 .build();
 
