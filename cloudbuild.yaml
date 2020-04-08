@@ -1,0 +1,9 @@
+steps:
+- name: 'gradle:jdk8'
+  args: ['gradle', 'uploadArchive']
+  secretEnv: ['PACKAGECLOUD_TOKEN', 'PACKAGECLOUD_READ_TOKEN']
+secrets:
+- kmsKeyName: 'projects/mendel-health/locations/global/keyRings/mendel-master-keyring/cryptoKeys/default'
+  secretEnv:
+    PACKAGECLOUD_READ_TOKEN: 'CiQAEA8hPJLldeMwe4n7pvL772LXoeGATMg3Ji9yV2B3u2aBE/0SWQDj6E1DHn1Wf20IuzPoQOcImDmn8YU4Q2gwDpYOLiXLhD7HwGpT22RDJ13msQjNHzKtqa5YdtauOWkUFhmW1AZ06LacINBmHTYZ/DHadI6X1libnAUa7RMr'
+    PACKAGECLOUD_TOKEN: 'CiQAEA8hPJncDhOATYVYP/kK4TvD8Kj0vdhaq84tT31NCRIEZHYSWQDj6E1D/3hGHdRIIGm791m891TwXIQSTOVJs5SeaGVQNlGzb9jZyQt1LqO5ogO+rk93DAIeyn7prGjW+3ETh532uLFb4Sy5Dabiuiil6Vi/wWKoHo5s6SKT'

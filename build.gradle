@@ -1,0 +1,63 @@
+group 'ai.mendel.core.dbcopy'
+version System.getenv("VERSION")
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+mainClassName="ai.mendel.core.dbcopy.BulkCopy"
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+def read_token = project.hasProperty("packagecloud_read_token") ? packagecloud_read_token: System.getenv("PACKAGECLOUD_READ_TOKEN")
+
+repositories {
+    mavenCentral()
+    maven { url "https://packagecloud.io/priv/$read_token/mendel-internal/mendel-brain/maven2" }
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+dependencies {
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.3-1100-jdbc4'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.3.1'
+    compile 'org.jasypt:jasypt:1.9.2'
+    compile 'com.google.cloud.sql:postgres-socket-factory:1.0.12'
+    compile 'ai.mendel.core:mendel-utils:1.48'
+}
+
+application{
+    mainClassName project.hasProperty("mainClass") ? getProperty("mainClass"):mainClassName
+}
+
+//######### Publishing part #########
+configurations {
+    deployerJars
+}
+dependencies {
+    deployerJars "io.packagecloud.maven.wagon:maven-packagecloud-wagon:0.0.6"
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository(url: "packagecloud+https://packagecloud.io/mendel-internal/mendel-brain") {
+            authentication(password: System.getenv("PACKAGECLOUD_TOKEN"))
+        }
+        addFilter('jar')
+                {
+                    artifact, file -> artifact.ext == 'jar'
+                }
+    }
+}
