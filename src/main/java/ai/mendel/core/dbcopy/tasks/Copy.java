@@ -96,28 +96,33 @@ public class Copy implements Callable<Long> {
                 }
                 ArrayList<String> data = item.getData();
                 String row = "";
-                if(selectedColumns != null && !selectedColumns.isEmpty()){
-                    StringBuilder rowBuilder = new StringBuilder();
-                    for(IndexToColumnMapper mapper : selectedColumns){
-                        String d = data.get(mapper.getInputIndex());
-                        if(escapedColumns.contains(mapper.getDBColumnName())){
-                            d = d.replaceAll("\u0000", "");
-                            if(!isTSV) {
-                                d = "\"" + d.replaceAll("\"", "\"\"") + "\"";
-                            }else{
-                                d = d.replace("\\", "\\\\");
+                try {
+                    if (selectedColumns != null && !selectedColumns.isEmpty()) {
+                        StringBuilder rowBuilder = new StringBuilder();
+                        for (IndexToColumnMapper mapper : selectedColumns) {
+                            String d = data.get(mapper.getInputIndex());
+                            if (escapedColumns.contains(mapper.getDBColumnName())) {
+                                d = d.replaceAll("\u0000", "");
+                                if (!isTSV) {
+                                    d = "\"" + d.replaceAll("\"", "\"\"") + "\"";
+                                } else {
+                                    d = d.replace("\\", "\\\\");
+                                }
                             }
+                            rowBuilder.append(d).append(isTSV ? '\t' : ',');
                         }
-                        rowBuilder.append(d).append(isTSV ? '\t':',') ;
+                        rowBuilder.deleteCharAt(row.length() - 1);
+                        row = rowBuilder.toString();
+                    } else {
+                        row = String.join(isTSV ? "\t" : ",", data);
                     }
-                    rowBuilder.deleteCharAt(row.length()-1);
-                    row  = rowBuilder.toString();
+                    if (row.length() == 0) {
+                        continue;
+                    }
                 }
-                else {
-                    row = String.join(isTSV ? "\t":",", data);
-                }
-                if(row.length() == 0){
-                    continue;
+                catch (Exception e){
+                    throw new RuntimeException("Error while processing copy of item: \n" +
+                            String.join(",", data) +"\n\n", e);
                 }
 
                 // we have data lets write it
