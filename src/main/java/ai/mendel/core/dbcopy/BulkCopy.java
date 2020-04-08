@@ -158,11 +158,13 @@ public class BulkCopy {
      * @throws SQLException
      */
     public void dropTables(List<String> tableNames) throws SQLException {
-        try(DataStore store = new DataStore(getMultiQueryURL(configs.url), configs.user,
+        try(DataStore store = new DataStore(configs.url, configs.user,
                 configs.password, 3)){
             store.retriableSqlBlock(conn -> {
-                try(Statement stmt = conn.createStatement()){
-                    stmt.execute(tableNames.stream().map(Queries::drop).collect(Collectors.joining(";")));
+                for(String tn : tableNames) {
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(Queries.drop(tn));
+                    }
                 }
             });
         }
@@ -208,15 +210,15 @@ public class BulkCopy {
                 GCStorage.fixURI(Paths.get(configs.outputPath, INDEX_FILE).toString()))
                 .getContent(true);
 
-        try(DataStore store = new DataStore(getMultiQueryURL(configs.url), configs.user, configs.password, 3)){
+        try(DataStore store = new DataStore(configs.url, configs.user, configs.password, 3)){
             store.retriableSqlBlock(conn -> {
-                try (Statement stmt = conn.createStatement()) {
-                    logger.info("recreating constraints: \n" + constraints);
-                   stmt.execute(constraints);
-                }
-                try (Statement stmt = conn.createStatement()) {
-                    logger.info("recreating indices: \n" + indices);
-                    stmt.execute(indices);
+                ArrayList<String> cmds = new ArrayList<>(Arrays.asList(constraints.split(";")));
+                cmds.addAll(Arrays.asList(indices.split(";")));
+
+                for(String cmd : cmds) {
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(cmd);
+                    }
                 }
             });
         }
@@ -225,7 +227,7 @@ public class BulkCopy {
 
     private void dropConstraints() throws SQLException {
 
-        try(DataStore store = new DataStore(getMultiQueryURL(configs.url), configs.user, configs.password, 3)){
+        try(DataStore store = new DataStore(configs.url, configs.user, configs.password, 3)){
            saveConstraints(store);
             store.retriableSqlBlock(conn -> {
                 StringBuilder builder = new StringBuilder();
@@ -326,9 +328,6 @@ public class BulkCopy {
         }
     }
 
-    private static String getMultiQueryURL(String url){
-        return url + "?allowMultiQueries=true";
-    }
 
     public static void main(String[] args) throws SQLException, ExecutionException, InterruptedException {
 
