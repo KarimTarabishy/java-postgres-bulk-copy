@@ -65,7 +65,6 @@ public class CopyManager {
             }
             logger.info("Copy done");
             logger.info("Total files read: " + readTask.get() + "\n" +
-                    "Total copied files: " + writtenFiles.getValue() + "\n" +
                     "Copied rows: " + copyTask.get());
 
         }

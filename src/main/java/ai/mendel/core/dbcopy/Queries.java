@@ -57,7 +57,7 @@ public class Queries {
                 "  join pg_indexes pgidxs on pgidxs.tablename = tbl.relname " +
                 "       and pgidxs.schemaname = tnsp.nspname and idx.relname = pgidxs.indexname\n" +
                 "  LEFT JOIN pg_depend d ON d.objid = pgi.indexrelid AND d.deptype = 'i'\n" +
-                "where pgi.indisunique AND pgi.indrelid = '"+tableName+"'::regclass\n" +
+                "where pgi.indrelid = '"+tableName+"'::regclass\n" +
                 "    AND d.objid IS NULL;";
     }
 
