@@ -37,7 +37,7 @@ public class Read implements Callable<Long> {
     public Long call() throws Exception {
         GCStorage storage = new GCStorage();
         long total = 0L;
-        while (currentIndex < paths.size() && total < 30){
+        while (currentIndex < paths.size()){
             if(forceStop.get() || Thread.currentThread().isInterrupted()){
                 return 0L;
             }
