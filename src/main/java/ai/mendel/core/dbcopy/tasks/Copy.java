@@ -111,7 +111,7 @@ public class Copy implements Callable<Long> {
                             }
                             rowBuilder.append(d).append(isTSV ? '\t' : ',');
                         }
-                        rowBuilder.deleteCharAt(row.length() - 1);
+                        rowBuilder.deleteCharAt(rowBuilder.length() - 1);
                         row = rowBuilder.toString();
                     } else {
                         row = String.join(isTSV ? "\t" : ",", data);
