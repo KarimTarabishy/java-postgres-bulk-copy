@@ -60,7 +60,11 @@ public class Transform implements Callable<Void> {
             ArrayList<InputItem> finalItems = new ArrayList<>();
             if(pointerTSVColIndex != null && pointerTSVColIndex > -1){
                 String pointer = pointerTSVColTransformer.apply(item.getData().get(pointerTSVColIndex));
-                String [] lines = storage.object(pointer).getContent(true).split("\n");
+                String data = storage.object(pointer).getContent(true);
+                if(data == null){
+                    throw new RuntimeException("File not found " + pointer);
+                }
+                String [] lines = data.split("\n");
                 finalItems.addAll(Arrays.stream(lines)
                         .map(s -> new InputItem(s, true))
                         .collect(Collectors.toCollection(ArrayList::new)));

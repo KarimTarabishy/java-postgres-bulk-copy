@@ -364,7 +364,7 @@ public class BulkCopy {
                         "\ton clues_ke.entities (patient_id);\n" +
                         "\n")
                 .treatInputTSVAsPointer(2,
-                        s -> GCStorage.fixURI(Paths.get(s, "entities.txt").toString()))
+                        s -> GCStorage.fixURI(Paths.get(s, "entities.tsv").toString()))
                 .selectFields(new ArrayList<>(Arrays.asList(
                         new IndexToColumnMapper(0, "patient_id"),
                         new IndexToColumnMapper(1, "medical_record_id"),
