@@ -44,7 +44,7 @@ public class Queries {
                 "FROM pg_constraint\n" +
                 "INNER JOIN pg_class ON conrelid=pg_class.oid\n" +
                 "INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace\n" +
-                "where nspname = '"+schema+"' AND relname='"+rel+"\n" +
+                "where nspname = '"+schema+"' AND relname='"+rel+"'\n" +
                 "ORDER BY CASE WHEN contype='f' THEN 0 ELSE 1 END,contype,nspname,relname,conname;";
     }
 
@@ -70,5 +70,9 @@ public class Queries {
                 "   AND    d.objid IS NULL;";
     }
 
+    public static void main(String[] args) {
+        String t = createconstraints("clues_ke.entities", "cmd");
+        System.out.println(t);
+    }
 
 }
