@@ -333,57 +333,59 @@ public class BulkCopy {
 
         String url = args[0], user = args[1], password = args[2];
         BulkCopy bulkCopy = BulkCopy.build(
-                "gs://pipeline_output/expert/3-5-2020/test_new_copy",
+                "gs://pipeline_output/expert/3-5-2020/test_new_copy/relations",
                 "gs://pipeline_output/expert/3-5-2020/clues-ke-8/listing.tsv",
-                "clues_ke.entities",
+                "clues_ke.relations",
                 true,
                 url, user, password)
-                .addCreateQuery("create table if not exists clues_ke.entities\n" +
+                .addCreateQuery("create table if not exists clues_ke.relations\n" +
                         "(\n" +
-                        "\tpatient_id bigint not null\n" +
-                        "\t\tconstraint entities_patient_id_fk\n" +
-                        "\t\t\treferences emr.patient,\n" +
-                        "\tmedical_record_id bigint not null\n" +
-                        "\t\tconstraint entities_medical_record_id_fk\n" +
-                        "\t\t\treferences emr.medical_record,\n" +
-                        "\tid varchar(255) not null\n" +
-                        "\t\tconstraint entities_pk\n" +
+                        "\tid bigserial not null\n" +
+                        "\t\tconstraint relations_pk\n" +
                         "\t\t\tprimary key,\n" +
-                        "\ttype varchar not null,\n" +
-                        "\ttext text not null,\n" +
-                        "\tstart integer not null,\n" +
-                        "\t\"end\" integer not null\n" +
+                        "\tparent_entity_id varchar not null\n" +
+                        "\t\tconstraint relations_entities_id_fk\n" +
+                        "\t\t\treferences clues_ke.entities,\n" +
+                        "\tparent_entity_type varchar not null,\n" +
+                        "\trelation_type varchar not null,\n" +
+                        "\tchild_entity_id varchar not null\n" +
+                        "\t\tconstraint relations_entities_id_fk_2\n" +
+                        "\t\t\treferences clues_ke.entities,\n" +
+                        "\tchild_entity_type varchar not null\n" +
                         ");\n" +
                         "\n" +
                         "\n" +
-                        "create index if not exists entities_type_index\n" +
-                        "\ton clues_ke.entities (type);\n" +
+                        "create index if not exists relations_child_entity_id_index\n" +
+                        "\ton clues_ke.relations (child_entity_id);\n" +
                         "\n" +
-                        "create index if not exists entities_medical_record_id_index\n" +
-                        "\ton clues_ke.entities (medical_record_id);\n" +
+                        "create index if not exists relations_child_entity_type_index\n" +
+                        "\ton clues_ke.relations (child_entity_type);\n" +
                         "\n" +
-                        "create index if not exists entities_patient_id_index\n" +
-                        "\ton clues_ke.entities (patient_id);\n" +
-                        "\n")
+                        "create index if not exists relations_parent_entity_id_index\n" +
+                        "\ton clues_ke.relations (parent_entity_id);\n" +
+                        "\n" +
+                        "create unique index if not exists relations_parent_entity_id_relation_type_child_entity_id_uindex\n" +
+                        "\ton clues_ke.relations (parent_entity_id, relation_type, child_entity_id);\n" +
+                        "\n" +
+                        "create index if not exists relations_parent_entity_type_index\n" +
+                        "\ton clues_ke.relations (parent_entity_type);\n")
                 .treatInputTSVAsPointer(2,
-                        s -> GCStorage.fixURI(Paths.get(s, "entities.tsv").toString()))
+                        s -> GCStorage.fixURI(Paths.get(s, "relations.tsv").toString()))
                 .selectFields(new ArrayList<>(Arrays.asList(
-                        new IndexToColumnMapper(0, "patient_id"),
-                        new IndexToColumnMapper(1, "medical_record_id"),
-                        new IndexToColumnMapper(2, "id"),
-                        new IndexToColumnMapper(3, "type"),
-                        new IndexToColumnMapper(4, "text"),
-                        new IndexToColumnMapper(5, "start"),
-                        new IndexToColumnMapper(6, "\"end\"")
+                        new IndexToColumnMapper(0, "parent_entity_id"),
+                        new IndexToColumnMapper(1, "parent_entity_type"),
+                        new IndexToColumnMapper(2, "relation_type"),
+                        new IndexToColumnMapper(3, "child_entity_id"),
+                        new IndexToColumnMapper(4, "child_entity_type")
                 )))
-                .setEscapedColumns(Collections.singletonList("text"))
+//                .setEscapedColumns(Collections.singletonList("text"))
                 .dropConstraints()
                 .setNullString("\\N")
                 .setThreadsMultiplier(6)
                 .build();
 
-        bulkCopy.dropTables(Arrays.asList("clues_ke.temporal", "clues_ke.spatial", "clues_ke.object_properties",
-                "clues_ke.objects", "clues_ke.relations", "clues_ke.entities"));
+//        bulkCopy.dropTables(Arrays.asList("clues_ke.temporal", "clues_ke.spatial", "clues_ke.object_properties",
+//                "clues_ke.objects", "clues_ke.relations", "clues_ke.entities"));
         bulkCopy.copy();
     }
 
