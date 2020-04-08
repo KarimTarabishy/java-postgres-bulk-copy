@@ -38,6 +38,7 @@ class BulkCopyBuilder {
         this.url = url;
         this.user = user;
         this.password = password;
+        this.copyAsTSV = copyAsTSV;
     }
 
     /**
