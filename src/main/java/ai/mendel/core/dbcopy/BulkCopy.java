@@ -5,7 +5,13 @@ import ai.mendel.core.dbcopy.input.IndexToColumnMapper;
 import ai.mendel.core.dbcopy.transformers.InputTransformer;
 import ai.mendel.core.utils.DataStore;
 import ai.mendel.core.utils.GCStorage;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.properties.EncryptableProperties;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +19,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -29,15 +36,51 @@ class BulkCopyBuilder {
     String createQuery = null;
     Integer pointerTSVColIndex = null;
     Function<String, String> pointerTSVColTransform = null;
-    public BulkCopyBuilder(String outputPath, String inputTSVPath, String tableName, boolean copyAsTSV,
-                           String url, String user, String password){
+    public BulkCopyBuilder(String outputPath, String inputTSVPath, String tableName, boolean copyAsTSV){
         this.inputTSVPath = inputTSVPath;
         this.tableName = tableName;
         this.outputPath = outputPath;
+        this.copyAsTSV = copyAsTSV;
+    }
+
+    public BulkCopyBuilder setDBCredentials(String url, String user, String password){
         this.url = url;
         this.user = user;
         this.password = password;
-        this.copyAsTSV = copyAsTSV;
+        return this;
+    }
+
+    /**
+     * Get database credentials from a propertiesfile on storage
+     * @param gcs_property_file_path fully qualified path for property file
+     * @param property_name database prefix property name
+     * @param gcs_key_path fully qualified path for decryption key file used to decrypt password properties
+     * @throws IOException
+     */
+    public BulkCopyBuilder setDBCredentialsFromPropertyFile(String gcs_property_file_path, String property_name,
+                                                            String gcs_key_path) throws IOException {
+        GCStorage storage = new GCStorage();
+        String key =  storage.object(gcs_key_path).getContent(true);
+        if (key == null) {
+            throw new RuntimeException("Couldn't find key file: " + gcs_key_path);
+        }
+
+        StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+        encryptor.setPassword(key);
+        Properties props = new EncryptableProperties(encryptor);
+
+        String properties_file = storage.object(gcs_property_file_path).getContent(true);
+
+        if (properties_file == null) {
+            throw new RuntimeException("Couldn't find properties file: " + gcs_property_file_path);
+        }
+
+        InputStream properties_stream = new ByteArrayInputStream(properties_file.getBytes(StandardCharsets.UTF_8));
+        props.load(properties_stream);
+        url = props.getProperty(property_name + ".url");
+        user = props.getProperty(property_name + ".user");
+        password = props.getProperty(property_name + ".pass");
+        return this;
     }
 
     /**
@@ -145,8 +188,8 @@ public class BulkCopy {
     }
 
     public static BulkCopyBuilder build(String outputPath, String inputTSVPath, String tableName,
-                                          boolean copyAsTSV, String url, String user, String password){
-        return new BulkCopyBuilder(outputPath, inputTSVPath, tableName, copyAsTSV, url, user, password);
+                                          boolean copyAsTSV){
+        return new BulkCopyBuilder(outputPath, inputTSVPath, tableName, copyAsTSV);
     }
 
     /**
@@ -332,8 +375,8 @@ public class BulkCopy {
             "gs://pipeline_output/expert/3-5-2020/test_new_copy/relations",
             "gs://pipeline_output/expert/3-5-2020/clues-ke-8/listing.tsv",
             "clues_ke.objects",
-            true,
-            url, user, password)
+            true)
+            .setDBCredentials(url, user, password)
             .addCreateQuery("create table if not exists clues_ke.relations\n" +
                     "(\n" +
                     "\tid bigserial not null\n" +
