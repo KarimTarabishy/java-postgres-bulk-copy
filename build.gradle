@@ -1,4 +1,4 @@
-group 'ai.mendel.core.dbcopy'
+group 'ai.mendel.core'
 version 1.0
 
 buildscript {
