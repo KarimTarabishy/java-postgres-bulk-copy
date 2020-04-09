@@ -26,6 +26,7 @@ public class BulkCopyBuilder {
     ArrayList<IndexToColumnMapper> fieldsMapper = null;
     String createQuery = null;
     Integer pointerTSVColIndex = null;
+    String initQuery;
     Function<String, String> pointerTSVColTransform = null;
     public BulkCopyBuilder(String outputPath, String inputTSVPath, String tableName, boolean copyAsTSV){
         this.inputTSVPath = inputTSVPath;
@@ -41,6 +42,14 @@ public class BulkCopyBuilder {
         return this;
     }
 
+    /**
+     * Set a query to be executed before starting the copy
+     * @param query
+     */
+    public BulkCopyBuilder setInitQuery(String query){
+        this.initQuery = query;
+        return this;
+    }
     /**
      * Get database credentials from a propertiesfile on storage
      * @param gcs_property_file_path fully qualified path for property file

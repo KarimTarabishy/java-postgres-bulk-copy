@@ -63,6 +63,16 @@ public class BulkCopy {
      * @throws InterruptedException
      */
     public void copy() throws SQLException, ExecutionException, InterruptedException {
+        if(configs.initQuery != null && !configs.initQuery.isEmpty()){
+            logger.info("Running init query: " + configs.initQuery);
+            try(DataStore store = new DataStore(configs.url, configs.user, configs.password, 3)){
+                store.retriableSqlBlock(conn -> {
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(configs.initQuery);
+                    }
+                });
+            }
+        }
         if(configs.createQuery != null && !configs.createQuery.isEmpty()){
             logger.info("Dropping and recreating table...");
             recreateTable();
