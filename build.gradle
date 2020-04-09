@@ -1,5 +1,5 @@
 group 'ai.mendel.core.dbcopy'
-version System.getenv("VERSION")
+version 1.0
 
 buildscript {
     repositories {
