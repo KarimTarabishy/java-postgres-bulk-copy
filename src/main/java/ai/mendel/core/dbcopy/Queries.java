@@ -62,7 +62,7 @@ public class Queries {
     }
 
     public static String dropIndices(String tableName, String resultColName){
-        return "SELECT 'DROP INDEX ' || string_agg(indexrelid::regclass::text,', ') || ';' as "+resultColName+"\n" +
+        return "SELECT 'DROP INDEX if exists ' || string_agg(indexrelid::regclass::text,', ') || ';' as "+resultColName+"\n" +
                 "   FROM   pg_index  i\n" +
                 "   LEFT   JOIN pg_depend d ON d.objid = i.indexrelid\n" +
                 "                          AND d.deptype = 'i'\n" +
