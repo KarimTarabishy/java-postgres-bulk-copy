@@ -1,5 +1,5 @@
 group 'ai.mendel.core'
-version 1.3
+version 1.4
 
 buildscript {
     repositories {

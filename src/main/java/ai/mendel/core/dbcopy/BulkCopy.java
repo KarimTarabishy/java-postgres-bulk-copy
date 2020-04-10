@@ -131,14 +131,20 @@ public class BulkCopy {
                     ResultSet resultSet = stmt.executeQuery(Queries.dropConstraints(configs.tableName,
                             "cmd"));
                     while(resultSet.next()){
-                        cmds.add(resultSet.getString("cmd"));
+                        String r = resultSet.getString("cmd");
+                        if(r != null && !r.isEmpty()){
+                            cmds.add(r);
+                        }
                     }
                 }
                 try(Statement stmt = conn.createStatement()){
                     ResultSet resultSet = stmt.executeQuery(Queries.dropIndices(configs.tableName,
                             "cmd"));
                     while(resultSet.next()){
-                        cmds.add(resultSet.getString("cmd"));
+                        String r = resultSet.getString("cmd");
+                        if(r != null && !r.isEmpty()){
+                            cmds.add(r);
+                        }
                     }
                 }
                 for(String cmd : cmds) {
